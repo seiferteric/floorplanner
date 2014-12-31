@@ -44,6 +44,15 @@ clearState = (c) ->
   localStorage.removeItem("existingState")
   c.clear()
   oldStates = []
+
+removeItem = (c) ->
+  obj = c.getActiveObject()
+  grp = c.getActiveGroup()
+  c.remove obj
+  grp.forEachObject (o) ->
+    c.remove o
+    c.discardActiveGroup().renderAll()
+  saveState(c)
   
 jQuery ->
     
@@ -83,14 +92,17 @@ jQuery ->
 
   canvas.on 'object:added', (d) ->
     saveState(canvas)
-  canvas.on 'object:removed', (d) ->
-    saveState(canvas)
+  # canvas.on 'object:removed', (d) ->
+  #   saveState(canvas)
   canvas.on 'object:modified', (d) ->
     saveState(canvas)
+
 
   $(document).keydown (e) ->
     if e.which == 90 && e.ctrlKey && e.shiftKey
        redoState(canvas)
     else if e.which == 90 && e.ctrlKey
        undoState(canvas)
+    else if e.which == 46
+      removeItem(canvas)
 
