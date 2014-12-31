@@ -1,8 +1,19 @@
 
 
 saveState = (c) ->
-  localStorage.setItem("currentState", JSON.stringify(c))
+  existingState = JSON.parse(localStorage.getItem("currentState"))
+  if !existingState
+    existingState = []
+  existingState.push c
+  localStorage.setItem("currentState", JSON.stringify(existingState))
 
+loadState = (c) ->
+  existingState = JSON.parse(localStorage.getItem("currentState"))
+  console.log existingState
+  if existingState
+    c.loadFromJSON existingState[existingState.length - 1]
+
+  
   
 jQuery ->
     
@@ -13,9 +24,7 @@ jQuery ->
   canvas.setWidth($(window).width()*.9)
   canvas.setHeight($(window).height())
 
-  existingState = localStorage.getItem("currentState")
-  if existingState
-    canvas.loadFromJSON existingState
+  loadState(canvas)
 
   $('#line').click (d) ->
     canvas.add(new fabric.Line([10, 0, 10, 100], { fill: 'red', stroke: 'red', strokeWidth: 10 }))
