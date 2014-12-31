@@ -1,19 +1,48 @@
 
-
+oldStates = []
+skipSave = false
 saveState = (c) ->
-  existingState = JSON.parse(localStorage.getItem("currentState"))
+  existingState = JSON.parse(localStorage.getItem("existingState"))
   if !existingState
     existingState = []
-  existingState.push c
-  localStorage.setItem("currentState", JSON.stringify(existingState))
+  if !skipSave
+    existingState.push JSON.stringify(c)
+    localStorage.setItem("existingState", JSON.stringify(existingState))
+    oldStates = []
+
+
 
 loadState = (c) ->
-  existingState = JSON.parse(localStorage.getItem("currentState"))
-  console.log existingState
-  if existingState
-    c.loadFromJSON existingState[existingState.length - 1]
+  existingState = JSON.parse(localStorage.getItem("existingState"))
+  if existingState && existingState.length > 0
+    skipSave = true
+    c.loadFromJSON JSON.parse(existingState[existingState.length - 1]), -> skipSave = false
 
+undoState = (c) ->
+  existingState = JSON.parse(localStorage.getItem("existingState"))
   
+  if existingState && existingState.length > 0
+    oldStates.push existingState.pop()
+    if existingState.length > 0
+      skipSave = true
+      c.loadFromJSON JSON.parse(existingState[existingState.length - 1]), -> skipSave = false
+    else
+      c.clear()
+    localStorage.setItem("existingState", JSON.stringify(existingState))
+
+redoState = (c) ->
+  existingState = JSON.parse(localStorage.getItem("existingState"))
+
+  if !existingState
+    existingState = []
+  if oldStates.length > 0
+    existingState.push oldStates.pop()
+    localStorage.setItem("existingState", JSON.stringify(existingState))
+    loadState(c)
+
+clearState = (c) ->
+  localStorage.removeItem("existingState")
+  c.clear()
   
 jQuery ->
     
@@ -38,11 +67,16 @@ jQuery ->
   $("#clear").click (d) ->
     canvas.clear()
     saveState(canvas)
+  $('#clearall').click (d) ->
+    clearState(canvas)
   $('#save').click (d) ->
     download = (url,name) ->
         $('<a>').attr({href:url,download:name})[0].click()
     download(canvas.toDataURL(),'floorplan.png')
-
+  $('#undo').click (d) ->
+    undoState(canvas)
+  $('#redo').click (d) ->
+    redoState(canvas)
 
 
   canvas.on 'object:added', (d) ->
