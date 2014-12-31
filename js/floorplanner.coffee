@@ -1,6 +1,21 @@
 
 oldStates = []
 skipSave = false
+
+
+object_types = {
+  'Circle': [{ radius: 30, fill: 'black', top: 100, left: 100 }], 
+  'Line': [[10, 0, 10, 100], { fill: 'black', stroke: 'black', strokeWidth: 10 }], 
+  'Rect': [{ left: 100, top: 100, width: 100, height: 100, fill: 'black' }], 
+  'Triangle': [{}], 
+  'Ellipse': [{top: 100, left: 100, rx: 100, ry: 75, fill: 'black', stroke: 'black'}], 
+  # 'Polyline': [{}], 
+  # 'Polygon': [{}], 
+  # 'Text': [{}], 
+  # 'Image': [{}], 
+  # 'Path': [{}]
+}
+
 saveState = (c) ->
   existingState = JSON.parse(localStorage.getItem("existingState"))
   if !existingState
@@ -9,8 +24,6 @@ saveState = (c) ->
     existingState.push JSON.stringify(c)
     localStorage.setItem("existingState", JSON.stringify(existingState))
     oldStates = []
-
-
 
 loadState = (c) ->
   existingState = JSON.parse(localStorage.getItem("existingState"))
@@ -54,25 +67,26 @@ removeItem = (c) ->
     c.discardActiveGroup().renderAll()
   saveState(c)
   
+
+initTools = (c) ->
+  for tn,defo of object_types
+    $('#tools').append "<br /><br /><button class='btn btn-warning' id='#{tn}'>#{tn}</button>"
+
+    $("##{tn}").click [tn, defo], (t) -> 
+      nobj = new fabric[t.data[0]](t.data[1]...)
+      c.add nobj
 jQuery ->
     
+  
   canvas = new fabric.Canvas('c', {
    backgroundColor: 'rgb(255, 255, 255)',
   })
+  initTools(canvas)
 
   canvas.setWidth($(window).width()*.9)
   canvas.setHeight($(window).height())
 
   loadState(canvas)
-
-  $('#line').click (d) ->
-    canvas.add(new fabric.Line([10, 0, 10, 100], { fill: 'red', stroke: 'red', strokeWidth: 10 }))
-    
-  $('#circle').click (d) ->
-    canvas.add(new fabric.Circle({ radius: 30, fill: '#f55', top: 100, left: 100 }))
-
-  $('#rectangle').click (d) ->
-    canvas.add(new fabric.Rect({ left: 100, top: 100, width: 100, height: 100, fill: '#f55' }))
 
   $("#clear").click (d) ->
     canvas.clear()
@@ -92,8 +106,6 @@ jQuery ->
 
   canvas.on 'object:added', (d) ->
     saveState(canvas)
-  # canvas.on 'object:removed', (d) ->
-  #   saveState(canvas)
   canvas.on 'object:modified', (d) ->
     saveState(canvas)
 
