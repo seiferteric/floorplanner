@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FloorPlanner</title>
+<link rel="stylesheet" href="/css/bootstrap.css" type='text/css' />
+<link rel="stylesheet" href="/css/bootstrap-theme.css" type='text/css' />
+<link rel="stylesheet" href="/css/d3-tip.min.css" type='text/css' />
+<script src="/js/jquery-2.1.1.js"></script>
+<script src="/js/fabric.js"></script>
+<script src="/js/bootstrap.js"></script>
+<script src="/js/coffee-script.js"></script>
+<script src="/js/floorplanner.coffee" type="text/coffeescript"></script>
+<style>
+#tools {
+  border-right: 1px solid black;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  width: 10%;
+}
+#work {
+  width: 90%;
+  position: absolute;
+  left: 10%;
+  top: 0px;
+  bottom: 0px;
+}
+
+</style>
+</head>
+<body>
+<div id="tools">
+<h3>Tools</h3>
+<button class="btn btn-warning" id="line">Line</button>
+<br />
+<br />
+<button class="btn btn-warning" id="circle">Circle</button>
+<br />
+<br />
+<button class="btn btn-warning" id="rectangle">Rectangle</button>
+<br />
+<br />
+<button class="btn btn-danger" id="clear">Clear</button>
+<br />
+<br />
+<button class="btn btn-success" id="save">Save</button>
+</div>
+<div id="work">
+<canvas id="c"></canvas>
+</div>
+</body>
+</html>
