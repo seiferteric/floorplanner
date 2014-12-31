@@ -4,11 +4,11 @@ skipSave = false
 
 
 object_types = {
-  'Circle': [{ radius: 30, fill: 'black', top: 100, left: 100 }], 
+  'Circle': [{ radius: 30, fill: 'black', top: 100, left: 100, fill: 'lightblue', stroke: 'black', strokeWidth: 5 }], 
   'Line': [[10, 0, 10, 100], { fill: 'black', stroke: 'black', strokeWidth: 10 }], 
-  'Rect': [{ left: 100, top: 100, width: 100, height: 100, fill: 'black' }], 
-  'Triangle': [{}], 
-  'Ellipse': [{top: 100, left: 100, rx: 100, ry: 75, fill: 'black', stroke: 'black'}], 
+  'Rect': [{ left: 100, top: 100, width: 100, height: 100, fill: 'lightblue', stroke: 'black', strokeWidth: 5 }], 
+  'Triangle': [{fill: 'lightblue', stroke: 'black', strokeWidth: 5}], 
+  'Ellipse': [{top: 100, left: 100, rx: 100, ry: 75, fill: 'lightblue', stroke: 'black', strokeWidth: 5 }], 
   # 'Polyline': [{}], 
   # 'Polygon': [{}], 
   # 'Text': [{}], 
@@ -67,6 +67,12 @@ removeItem = (c) ->
     c.discardActiveGroup().renderAll()
   saveState(c)
   
+zupItem = (c) ->
+  obj = c.getActiveObject()
+  obj.bringForward()
+zdownItem = (c) ->
+  obj = c.getActiveObject()
+  obj.sendBackwards()
 
 initTools = (c) ->
   for tn,defo of object_types
@@ -117,4 +123,8 @@ jQuery ->
        undoState(canvas)
     else if e.which == 46
       removeItem(canvas)
+    else if e.which == 33
+      zupItem(canvas)
+    else if e.which == 34
+      zdownItem(canvas)
 
