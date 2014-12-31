@@ -43,6 +43,7 @@ redoState = (c) ->
 clearState = (c) ->
   localStorage.removeItem("existingState")
   c.clear()
+  oldStates = []
   
 jQuery ->
     
@@ -73,6 +74,7 @@ jQuery ->
     download = (url,name) ->
         $('<a>').attr({href:url,download:name})[0].click()
     download(canvas.toDataURL(),'floorplan.png')
+
   $('#undo').click (d) ->
     undoState(canvas)
   $('#redo').click (d) ->
@@ -85,3 +87,10 @@ jQuery ->
     saveState(canvas)
   canvas.on 'object:modified', (d) ->
     saveState(canvas)
+
+  $(document).keydown (e) ->
+    if e.which == 90 && e.ctrlKey && e.shiftKey
+       redoState(canvas)
+    else if e.which == 90 && e.ctrlKey
+       undoState(canvas)
+
