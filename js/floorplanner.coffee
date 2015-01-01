@@ -20,7 +20,7 @@ saveState = (c) ->
   existingState = JSON.parse(localStorage.getItem("existingState"))
   if !existingState
     existingState = []
-  if !skipSave
+  if !skipSave && JSON.stringify(c) != existingState[existingState.length - 1]
     existingState.push JSON.stringify(c)
     localStorage.setItem("existingState", JSON.stringify(existingState))
     oldStates = []
@@ -76,11 +76,33 @@ zdownItem = (c) ->
 
 initTools = (c) ->
   for tn,defo of object_types
-    $('#tools').append "<br /><br /><button class='btn btn-warning' id='#{tn}'>#{tn}</button>"
+    $('#tools #shapes').append "<button class='btn btn-warning' id='#{tn}'>#{tn}</button>"
 
     $("##{tn}").click [tn, defo], (t) -> 
       nobj = new fabric[t.data[0]](t.data[1]...)
       c.add nobj
+
+loadProperties = (c) ->
+  obj = c.getActiveObject()
+  if !obj
+    unloadProperties(c)
+    return
+  $('#tools #properties').append("<label for='fill'>Fill</label><input id='fill' type='text' class='colorPicker' value='#{obj.fill}' />")
+  $('#fill').colorpicker().on 'changeColor', (e) ->
+    obj.setFill($(e.currentTarget).val())
+    c.renderAll()
+  $('#tools #properties').append("<label for='stroke'>Stroke</label><input id='stroke' type='text' class='colorPicker' value='#{obj.stroke}' />")
+  $('#stroke').colorpicker().on 'changeColor', (e) ->
+    obj.setStroke($(e.currentTarget).val())
+    c.renderAll()
+  $('#tools #properties').append("<label for='strokewidth'>Stroke Width</label><input id='strokewidth' type='number' value='#{obj.strokeWidth}' />")
+  $('#strokewidth').on 'change', (e) ->
+    obj.setStrokeWidth(parseInt($(e.currentTarget).val()))
+    c.renderAll()
+
+unloadProperties = (c) ->
+  saveState(c)
+  $('#tools #properties').html("")
 jQuery ->
     
   
@@ -89,8 +111,8 @@ jQuery ->
   })
   initTools(canvas)
 
-  canvas.setWidth($(window).width()*.9)
-  canvas.setHeight($(window).height())
+  canvas.setWidth($(window).width())
+  canvas.setHeight($(window).height() - $('#tools').outerHeight())
 
   loadState(canvas)
 
@@ -114,6 +136,12 @@ jQuery ->
     saveState(canvas)
   canvas.on 'object:modified', (d) ->
     saveState(canvas)
+  canvas.on 'object:selected', (d) ->
+    loadProperties(canvas)
+  canvas.on 'before:selection:cleared', (d) ->
+    unloadProperties(canvas)
+  canvas.on 'selection:cleared', (d) ->
+    unloadProperties(canvas)
 
 
   $(document).keydown (e) ->
